@@ -23,3 +23,27 @@ CREATE TABLE profissionais (
     pix_key TEXT UNIQUE,
     is_validated BOOLEAN DEFAULT false
 );
+
+CREATE TYPE tipo_servico AS ENUM ('simples', 'extra');
+CREATE TYPE status_chamado AS ENUM ('pendente', 'aceito', 'a_caminho', 'em_servico', 'finalizado_prof', 'aprovado_lojista', 'validado_adm');
+CREATE TYPE status_pagamento AS ENUM ('pendente', 'pago');
+
+CREATE TABLE chamados (
+    id SERIAL PRIMARY KEY,
+    lojista_id UUID REFERENCES lojistas(id),
+    profissional_id UUID REFERENCES profissionais(id),
+    tipo_servico tipo_servico,
+    descricao TEXT,
+    valor_cobrado_extra NUMERIC,
+    status status_chamado
+);
+
+CREATE TABLE transacoes (
+    id SERIAL PRIMARY KEY,
+    chamado_id INTEGER REFERENCES chamados(id),
+    profissional_id UUID REFERENCES profissionais(id),
+    valor_bruto NUMERIC,
+    comissao_plataforma NUMERIC,
+    valor_liquido_prof NUMERIC,
+    status_pagamento status_pagamento
+);
