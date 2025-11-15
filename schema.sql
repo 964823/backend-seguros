@@ -47,3 +47,23 @@ CREATE TABLE transacoes (
     valor_liquido_prof NUMERIC,
     status_pagamento status_pagamento
 );
+
+ALTER TABLE lojistas ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Lojistas can view their own data."
+ON lojistas
+FOR SELECT
+USING (
+  auth.uid() = id AND
+  (SELECT role FROM profiles WHERE profiles.id = auth.uid()) = 'lojista'
+);
+
+ALTER TABLE profissionais ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Profissionais can view their own data."
+ON profissionais
+FOR SELECT
+USING (
+  auth.uid() = id AND
+  (SELECT role FROM profiles WHERE profiles.id = auth.uid()) = 'profissional'
+);
