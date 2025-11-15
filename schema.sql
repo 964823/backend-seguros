@@ -67,3 +67,18 @@ USING (
   auth.uid() = id AND
   (SELECT role FROM profiles WHERE profiles.id = auth.uid()) = 'profissional'
 );
+
+ALTER TABLE chamados ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can see relevant chamados based on their role."
+ON chamados
+FOR SELECT
+USING (
+  (
+    (SELECT role FROM profiles WHERE profiles.id = auth.uid()) = 'lojista' AND
+    lojista_id = auth.uid()
+  ) OR (
+    (SELECT role FROM profiles WHERE profiles.id = auth.uid()) = 'profissional' AND
+    (profissional_id = auth.uid() OR status = 'pendente')
+  )
+);
